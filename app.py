@@ -16,7 +16,7 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 # login_manager.login_message = u"请先登陆"
 
-print(current_user, '89989')
+# print(current_user, '89989')
 
 
 @app.route('/')
@@ -99,8 +99,21 @@ def load_user(user_id):
     return User.get(user_id)
 
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'POST':
+        mysql = Mysql()
+        email = request.form.get('email', None)
+        tem = mysql.query_mail(email)
+        print(tem,'ddddddddddd')
+        if tem:
+            flash('邮箱已注册')
+            return redirect(url_for('register'))
+        elif request.form.get('password') == request.form.get('password1'):
+            flash('注册成功')
+            redirect(url_for('login'))
+        else:
+            flash('密码不一致')
     return render_template('register.html')
 
 

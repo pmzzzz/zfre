@@ -64,8 +64,16 @@
 {#                    {% else %}#}
                     <a href="{{ url_for('modify_bot', id=bot.id) }}" class="btn btn-success" role ="button">修改</a>
                     <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">详情</a>
+             {% if bot.status == 0 %}
+             <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">打开</a>
 {#                    {% endif %}#}
-                </td>
+
+    {% elif bot.status ==1 %}
+<a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">关闭</a>
+    {% else %}
+<a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">重启</a>
+    {% endif %}
+     </td>
     {% endfor %}
     {% endif %}
     </tr>
