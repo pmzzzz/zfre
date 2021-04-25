@@ -5,6 +5,7 @@
 @file:001torch.py
 @time:2021/01/19
 """
+import time
 
 import pymysql
 
@@ -43,16 +44,22 @@ class Mysql:
         self.cursor.execute('select * from user where id = %s limit 1 ', [id])
         return self.cursor.fetchall()
 
-    def add_bot(self, name, url, secret, userID, status,kw='大数据',site=1,period=1,time='09:00'):
-        sql = 'insert into bot (name ,url,secret,userID,status,kw,site,period,time) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)'
-        self.cursor.execute(sql, [name, url, secret, userID, status,kw,site,period,time])
+    def add_bot(self, name, url, secret, user_id, create_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),status=0,kw='大数据',site='人社',period=1,send_time='09:00'):
+        sql = 'insert into bot (name ,url,secret,user_id,create_time,status,kw,site,`period`,send_time) values (%s,' \
+              '%s,%s,%s,%s,%s,%s,%s,%s,%s) '
+        self.cursor.execute(sql, [name, url, secret, user_id, create_time,status,kw,site,period,send_time])
         self.content.commit()
+
+    def query_bots_by_user_id(self,user_id):
+        sql = 'select * from bot where user_id = %s '
+        self.cursor.execute(sql,[user_id])
+        return self.cursor.fetchall()
+
 
     def end(self):
         self.cursor.close()
         self.content.close()
 ######机器人修改
-
     # def modify_
 
 if __name__ == '__main__':
@@ -67,4 +74,8 @@ if __name__ == '__main__':
     print(z)
     a = mysql.query_user_id(1)
     print('xxxxx',a)
+
+    mysql.add_bot(name='数据库测试3',url='www.234.com',secret='sdqwwqff',user_id=100)
+    z = mysql.query_all_bot()
+    print(z)
     mysql.end()

@@ -50,6 +50,7 @@
         <th class="active">状态</th>
         <th class='active'>操作</th>
     </thead>
+    {% if bots %}
 {% for i,bot in bots %}
     <tr>
         <td>{{ i }}</td>
@@ -64,6 +65,7 @@
 {#                    {% endif %}#}
                 </td>
     {% endfor %}
+    {% endif %}
     </tr>
 
 
