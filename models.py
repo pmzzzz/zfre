@@ -32,7 +32,7 @@ class Bot:
     def __init__(self, name, url, secret, bot_id, user_id, status, kw='大数据', site='人设', period=1, send_time='09:00',
                  create_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())):
         self.create_time = create_time
-        self.status = EXC
+        self.status = status
         self.url = url
         self.secret = secret
         self.name = name
@@ -40,6 +40,7 @@ class Bot:
         self.user_id = user_id
         self.period = period
         self.send_time = send_time
+        self.kw = kw
 
     @classmethod
     def get(cls, bot_id):

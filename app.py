@@ -87,7 +87,7 @@ def manage():
         if len(bots) >= 1:
             bots = [Bot(bot_id=bot[0], url=bot[1], secret=bot[2], name=bot[3], status=bot[4], kw=bot[5], period=bot[6],
                         send_time=bot[7], user_id=bot[8], create_time=bot[9], site=bot[10]) for bot in bots]
-
+        print(bots[0].status, 'dsdwedei问问去')
         # bot = Bot(1, '123.com', 'se2448yb', '人社')
         # bots = [bot, bot, bot]
         #     name, url, secret, bot_id, user_id, status, kw = '大数据', site = '人设', period = 1, send_time = '09:00'
@@ -124,6 +124,12 @@ def logout():
     logout_user()
     flash('再见')
     return redirect(url_for('login'))
+
+
+@app.route('/bot_info/<int:id>')
+@login_required
+def bot_info(id):
+    return str(id) + '的详情'
 
 
 if __name__ == '__main__':
