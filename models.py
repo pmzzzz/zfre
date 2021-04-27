@@ -24,6 +24,20 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
 }
 
+from datetime import datetime
+from threading import Timer
+
+
+# 打印时间函数
+def printTime(inc):
+    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    t = Timer(inc, printTime, (inc,))
+    t.start()
+
+
+# 5s
+printTime(5)
+
 
 class User(UserMixin):
     def __init__(self, user_id, password, mail, name='仙桃'):
@@ -46,7 +60,8 @@ class User(UserMixin):
 
 class Bot:
     # name, url, secret, userID, status, kw, site, period, time
-    def __init__(self, name, url, secret, bot_id, user_id, status=0, kw='大数据', site='人社', period=1, send_time='09:00',
+    def __init__(self, name, url, secret, bot_id, user_id, status=0, kw='大数据', site='人社', period='day',
+                 send_time='09:00',
                  create_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())):
         self.result = []
         self.create_time = create_time
@@ -148,7 +163,7 @@ class Bot:
                 self.result = get_all_info_by_day_or_week(department=department, mode=mode, kw=kw)
                 if kw == ['，']:
                     kw = ['无']
-                print(kw,'kkkkkkkkwwww')
+                print(kw, 'kkkkkkkkwwww')
                 send_message(data=build_data(raw_data=self.result, keywords=kw), url=get_url(self.secret, self.url))
                 print('{}发送成功'.format(time_now))
                 time.sleep(100)
@@ -171,7 +186,7 @@ class Bot:
         }
 
         x = get_all_info_by_day_or_week(department=department, mode=mode, kw=kw)
-        send_message(test_data,url=get_url(self.secret, self.url))
+        send_message(test_data, url=get_url(self.secret, self.url))
         print('测试', x)
 
     def close(self):

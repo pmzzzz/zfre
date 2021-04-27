@@ -66,6 +66,13 @@
          <button id="btn_delete" type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteBot{{ bot.id }}">
                 <span class="glyphicon glyphicon-trash" aria-hidden="true" ></span>删除
             </button>
+
+              {% if bot.status ==0 %}
+             <a href="{{ url_for('bot_open', id=bot.id) }}" class="btn btn-success" role ="button">打开</a>
+                  {% else %}
+                  <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-warning" role ="button">关闭</a>
+                    {% endif %}
+
 {#                    {% else %}#}
 {#                    <a href="{{ url_for('modify_bot', id=bot.id) }}" class="btn btn-success" role ="button">修改</a>#}
 {#                    <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">详情</a>#}
@@ -171,11 +178,15 @@
 
                     <div class="form-group">
                         <label for="secret">secret</label>
-                        <input id="secret" type="text" class="form-control" name="url" value="" required autofocus>
+                        <input id="secret" type="text" class="form-control" name="secret" value="" required autofocus>
                     </div>
                     <div class="form-group">
-                        <label for="secret">机器人名称</label>
-                        <input id="secret" type="text" class="form-control" name="url" value="" required autofocus>
+                        <label for="name">机器人名称</label>
+                        <input id="name" type="text" class="form-control" name="name" value="" required autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label for="kw">关键词（以 、 隔开）</label>
+                        <input id="kw" type="text" class="form-control" name="kw" value="" required autofocus>
                     </div>
 
                 <div class="form-group">
@@ -199,10 +210,10 @@
                 <div class="form-group">
                     选择爬取模式
                      <label class="radio-inline">
-                    <input type="radio" name="mode" id="optionsRadios3" value="option1" checked> day
+                    <input type="radio" name="mode" id="optionsRadios3" value="day" checked> day
                     </label>
                     <label class="radio-inline">
-                    <input type="radio" name="mode" id="optionsRadios4"  value="option2"> week
+                    <input type="radio" name="mode" id="optionsRadios4"  value="week"> week
                     </label>
                 </div>
 

@@ -58,9 +58,9 @@ class Mysql:
                              bot.period, bot.send_time])
         self.content.commit()
 
-    def query_bots_by_user_id(self, user_id):
+    def query_bots_by_user_id(self, user):
         sql = 'select * from bot where user_id = %s '
-        self.cursor.execute(sql, [user_id])
+        self.cursor.execute(sql, [user.id])
         return self.cursor.fetchall()
 
     def end(self):

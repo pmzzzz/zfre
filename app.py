@@ -6,7 +6,9 @@ from flask_bootstrap import Bootstrap
 from flask_login import login_required, login_user, logout_user, current_user, LoginManager
 from db import Mysql
 from models import User, Bot
-
+from utils import load_bot
+from multiprocessing import Process
+from threading import Thread
 app = Flask(__name__, static_url_path='/')
 app.config['SECRET_KEY'] = 'sauna*8'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=1)
@@ -14,16 +16,22 @@ bootstrap = Bootstrap(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
-# 装载所有机器人, id:机器人实例
-pri = Mysql()
-pri.cursor.execute('select id,url,secret,name,status,kw,period,send_time,user_id,create_time,site from bot')
-ppp = pri.cursor.fetchall()
-pri.end()
-global_bots = {i[0]: Bot(bot_id=i[0], url=i[1], secret=i[2], name=i[3], status=i[4],
-                         kw=i[5], period=i[6], send_time=i[7], user_id=i[8], create_time=i[9], site=i[10]
-                         ) for i in ppp
-               }
 
+
+# 装载所有机器人, id:机器人实例:
+def load_all_bot():
+    pri = Mysql()
+    pri.cursor.execute('select id,url,secret,name,status,kw,period,send_time,user_id,create_time,site from bot')
+    ppp = pri.cursor.fetchall()
+    pri.end()
+    return {i[0]: load_bot(i) for i in ppp}
+
+
+global_bots = load_all_bot()
+
+# for k,v in global_bots.items():
+#     t1 = Process(target=v.run(),)
+#     t1.start()
 
 # login_manager.login_message = u"请先登陆"
 
@@ -87,6 +95,8 @@ def login():
 @app.route("/manage", methods=['GET', 'POST'])
 @login_required
 def manage():
+    global global_bots
+    # global_bots =
     print(current_user.id, 'manage')
     if not current_user.id:
         flash('请先登录！')
@@ -94,7 +104,7 @@ def manage():
     else:
         print(current_user.password)
         mysql = Mysql()
-        bots = mysql.query_bots_by_user_id(current_user.id)
+        bots = mysql.query_bots_by_user_id(current_user)
         # if len(bots) >= 1:
         #     bots = [Bot(bot_id=bot[0], url=bot[1], secret=bot[2], name=bot[3], status=bot[4], kw=bot[5], period=bot[6],
         #                 send_time=bot[7], user_id=bot[8], create_time=bot[9], site=bot[10]) for bot in bots]
@@ -141,6 +151,13 @@ def modify_bot(id):
 @app.route('/delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 def delete_bot(id):
+    bot = global_bots[id]
+    bot.status = 0
+    global_bots.pop(id)
+    ms = Mysql()
+    sql = 'delete from bot where id = %s'
+    ms.cursor.execute(sql,[id])
+    ms.content.commit()
     flash(str(id) + '被删了')
 
     return redirect(url_for('manage'))
@@ -150,9 +167,26 @@ def delete_bot(id):
 @login_required
 def add_bot():
     print('sdsds')
+    # print(request.form.to_dict())
+    site = '、'.join(request.form.getlist('sites'))
+    mode = request.form.get('mode')
+    url = request.form.get('url',None)
+    secret = request.form.get('secret')
+    status = 0
+    kw = request.form.get('kw')
+    send_time = request.form.get('send_time')
+    name = request.form.get('name')
+
     print(request.form.to_dict())
-    print(request.form.getlist('sites'))
-    return 'hxhxh'
+    # print(url)
+    temp = Bot(bot_id=-1,site=site,send_time=send_time,period=mode,url=url,user_id=current_user.id,status=status,secret=secret,kw=kw,name=name)
+    print(temp)
+    mss = Mysql()
+    mss.add_bot(temp)
+    del temp
+    bot = load_bot(mss.query_all_bot()[-1])
+    global_bots[bot.id] = bot
+    return redirect(url_for('manage'))
 
 
 @app.route('/logout')
@@ -170,9 +204,20 @@ def bot_info(id):
     # if mysql:
     #     x = list(filter(lambda x: x[0] == id, mysql.query_all_bot()))[0]
     x = list(filter(lambda y: y[0] == id, mysql.query_all_bot()))[0]
-
     return render_template('info.html', x=x)
 
 
+@app.route('/bot_open/<int:id>')
+@login_required
+def bot_open(id):
+    bot = global_bots[id]
+    bot.status = 1
+    global_bots[id] = bot
+    bot.test()
+
+    return redirect(url_for('manage'))
+
+
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5050)
+    app.run(debug=True, host='0.0.0.0', port=5050,processes=True)
