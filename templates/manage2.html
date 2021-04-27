@@ -44,9 +44,10 @@
     <thead>
         <th class="active">ID</th>
 {#        <th class="active">No</th>#}
-        <th class="active">名称</th>
+        <th class="active">群名</th>
         <th class="active">关键词</th>
         <th class="active">创建时间</th>
+        <th class="active">发送时间</th>
         <th class="active">状态</th>
         <th class='active'>操作</th>
     </thead>
@@ -57,7 +58,18 @@
         <td> <a href="{{ url_for('bot_info', id=bot.id) }}"> {{ bot.name }}</a></td>
         <td> {{ bot.kw }}</td>
         <td> {{ bot.create_time }}</td>
-        <td> {{ bot.status }}</td>
+        <td> {{ bot.send_time }}</td>
+        <td>
+            {% if bot.status == 1 %}
+                 <button id="btn_delete" type="button" class="btn btn-success">
+                <span class="glyphicon glyphicon-check" aria-hidden="true" ></span>运行中
+                </button>
+            {% else %}
+                <button id="btn_delete" type="button" class="btn btn-warning">
+                <span class="glyphicon glyphicon-alert" aria-hidden="true" ></span>未运行
+                </button>
+        {% endif %}
+        </td>
          <td>
 {#         <a class='fa fa-lg fa-warning text-red' data-toggle="modal" data-href='{{url_for('bot_info', id=bot.id)}}'#}
 {#                                    data-target="#confirm-delete">删除</a>#}
@@ -181,7 +193,7 @@
                         <input id="secret" type="text" class="form-control" name="secret" value="" required autofocus>
                     </div>
                     <div class="form-group">
-                        <label for="name">机器人名称</label>
+                        <label for="name">群名</label>
                         <input id="name" type="text" class="form-control" name="name" value="" required autofocus>
                     </div>
                     <div class="form-group">

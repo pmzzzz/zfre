@@ -2,8 +2,8 @@
 {% block title %}主页{% endblock %}
 {% block navli %}
 <!--    <ul class="nav navbar-nav navbar-right">-->
-<!--        {% if session.is_login %}-->
-<!--            <li><a href="/">您好！{{ session.name }}</a></li>-->
+<!--        {% if current_user.id %}-->
+<!--            <li><a href="/">您好！{{ current_use.name }}</a></li>-->
 <!--            <li><a href="/logout">退出</a><li>-->
 <!--            {% else %}-->
 <!--            <li><a href="/">您好！</a></li>-->
@@ -15,8 +15,8 @@
 {% block content %}
     <div class="container text-center">
         <img src="/img/logo.png" alt="logo">
-        {% if session.is_login %}
-            <h1>{{ session.name }}欢迎回来！</h1>
+        {% if current_user.id %}
+            <h1>{{ current_user.name }}欢迎回来！</h1>
         {% else %}
             <h1>欢迎！</h1>
         {% endif %}
