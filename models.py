@@ -4,7 +4,7 @@ import time
 from flask_login import UserMixin
 from db import Mysql
 import requests
-
+from apscheduler.schedulers.blocking import BlockingScheduler
 from ddddd import get_url, send_message, getYesterday, build_data, save_json
 from one_process import *
 
@@ -36,7 +36,7 @@ def printTime(inc):
 
 
 # 5s
-printTime(5)
+# printTime(5)
 
 
 class User(UserMixin):
@@ -85,88 +85,56 @@ class Bot:
         else:
             raise RuntimeError('没找到用户')
 
-    def pa(self):
-        self.status = 1
-        # 修改数据库status
-
-        url = urls[self.site]
-        params = {
-            'searchWord': self.kw,
-            'pageNumber': 1,
-            'advancedQuery.timeRange': self.period
-        }
-        try:
-            response = requests.get(url=url, params=params, headers=headers, verify=False)
-            print(response.json())
-            total = int(response.json()['page']['total'])
-            total_pages = int(response.json()['page']['totalPages'])
-            print('hhhh')
-        except Exception as e:
-            # self.status = 0
-            print('hhh')
-            total = 0
-            total_pages = 0
-            print(e)
-            result = []
-            print('sssrw')
-        if total != 0:
-            for pg in range(1, total_pages + 1):
-                print('{},第-{}-页'.format(self.kw, pg))
-                params = {
-                    'searchWord': self.kw,
-                    'pageNumber': pg,
-                    'advancedQuery.timeRange': self.period
-                }
-                try:
-                    response = requests.get(url=url, params=params, headers=headers, verify=False)
-                    time.sleep(5)
-                    # print(response.json())
-                    content = response.json()['page']['content']
-                    result += content
-                    self.result = result
-                    # 所有结果的列表
-                except:
-                    print('sss')
-                    # self.status = 0
-        print(result)
-
-        # 保存
-
-        # return DelRepeat(result, 'url')
-        # return result
+    # def pa(self):
+    #     department = self.site.split('、')
+    #     kw = self.kw.split()
+    #     mode = self.period
+    #     self.result = get_all_info_by_day_or_week(department=department, mode=mode, kw=kw)
+    #     if kw == ['，']:
+    #         kw = ['无']
+    #     print(kw, 'kkkkkkkkwwww')
+    #     send_message(data=build_data(raw_data=self.result, keywords=kw), url=get_url(self.secret, self.url))
+    #     # print('{}发送成功'.format(time_now))
 
     def run(self):
         # 发送
-        self.status = 1
-        # 修改数据库
-        department = self.site.split('、')
-        kw = self.kw.split()
-        mode = 'week'
-        while self.status == 1:
-            time.sleep(1)
-            time_now = time.strftime("%H:%M:%S", time.localtime())  # 刷新
-            print(time_now)
-            # if time_now == "23:35:00":  # 此处设置每天定时的时间
-            #     # 此处3行替换为需要执行的动作
-            #     # print("hello")
-            #     # fp = save_json()
-            #     # print('{}保存成功'.format(time_now))
-            #     # time.sleep(100)
-            if time_now == self.send_time:
-                # print('hello')
-                # fp = './output/{}.json'.format(getYesterday())
-                # print(fp)
-                # # fp = './output/{}.json'.format('2020-12-28-15')
-                # with open(fp, 'r') as f:
-                #     content = f.read()
-                #     js = json.loads(content)
-                self.result = get_all_info_by_day_or_week(department=department, mode=mode, kw=kw)
-                if kw == ['，']:
-                    kw = ['无']
-                print(kw, 'kkkkkkkkwwww')
-                send_message(data=build_data(raw_data=self.result, keywords=kw), url=get_url(self.secret, self.url))
-                print('{}发送成功'.format(time_now))
-                time.sleep(100)
+        print('run中')
+        if self.status == 1:
+            # # 修改数据库
+            #     tt = self.send_time.split(':')
+            #
+            #     scheduler = BlockingScheduler()
+            #     scheduler.add_job(self.pa, 'cron', hour=tt[0], minute=tt[1])
+            # scheduler.start()
+            department = self.site.split('、')
+            kw = self.kw.split()
+            mode = self.period
+            self.result = get_all_info_by_day_or_week(department=department, mode=mode, kw=kw)
+            if kw == ['，']:
+                kw = ['无']
+            print(kw, 'kkkkkkkkwwww')
+            send_message(data=build_data(raw_data=self.result, keywords=kw), url=get_url(self.secret, self.url))
+        # print('{}发送成功'.format(time_now))
+        # while self.status == 1:
+        #     time.sleep(1)
+        #     time_now = time.strftime("%H:%M:%S", time.localtime())  # 刷新
+        #     print(time_now)
+        #     # if time_now == "23:35:00":  # 此处设置每天定时的时间
+        #     #     # 此处3行替换为需要执行的动作
+        #     #     # print("hello")
+        #     #     # fp = save_json()
+        #     #     # print('{}保存成功'.format(time_now))
+        #     #     # time.sleep(100)
+        #     if time_now == self.send_time:
+        #         # print('hello')
+        #         # fp = './output/{}.json'.format(getYesterday())
+        #         # print(fp)
+        #         # # fp = './output/{}.json'.format('2020-12-28-15')
+        #         # with open(fp, 'r') as f:
+        #         #     content = f.read()
+        #         #     js = json.loads(content)
+        #
+        #         time.sleep(100)
         # 停止
 
     def test(self):

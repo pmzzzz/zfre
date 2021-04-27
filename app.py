@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 from flask import render_template, request, redirect, url_for, g, flash
 from flask_bootstrap import Bootstrap
@@ -9,6 +10,7 @@ from models import User, Bot
 from utils import load_bot
 from multiprocessing import Process
 from threading import Thread
+
 app = Flask(__name__, static_url_path='/')
 app.config['SECRET_KEY'] = 'sauna*8'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=1)
@@ -18,7 +20,7 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 
 
-# 装载所有机器人, id:机器人实例:
+# 装载所有机器人,:
 def load_all_bot():
     pri = Mysql()
     pri.cursor.execute('select id,url,secret,name,status,kw,period,send_time,user_id,create_time,site from bot')
@@ -28,10 +30,17 @@ def load_all_bot():
 
 
 global_bots = load_all_bot()
+global_running_scheduler = {}
 
-# for k,v in global_bots.items():
-#     t1 = Process(target=v.run(),)
-#     t1.start()
+# 开启非阻塞 存入scheduler
+for k, v in global_bots.items():
+    if v.status == 1:
+        h, m, s = v.send_time.split(':')
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(v.run, 'cron', hour=h, minute=m, second=s)
+        global_running_scheduler[k] = scheduler
+        scheduler.start()
+
 
 # login_manager.login_message = u"请先登陆"
 
@@ -156,7 +165,7 @@ def delete_bot(id):
     global_bots.pop(id)
     ms = Mysql()
     sql = 'delete from bot where id = %s'
-    ms.cursor.execute(sql,[id])
+    ms.cursor.execute(sql, [id])
     ms.content.commit()
     flash(str(id) + '被删了')
 
@@ -170,7 +179,7 @@ def add_bot():
     # print(request.form.to_dict())
     site = '、'.join(request.form.getlist('sites'))
     mode = request.form.get('mode')
-    url = request.form.get('url',None)
+    url = request.form.get('url', None)
     secret = request.form.get('secret')
     status = 0
     kw = request.form.get('kw')
@@ -179,7 +188,8 @@ def add_bot():
 
     print(request.form.to_dict())
     # print(url)
-    temp = Bot(bot_id=-1,site=site,send_time=send_time,period=mode,url=url,user_id=current_user.id,status=status,secret=secret,kw=kw,name=name)
+    temp = Bot(bot_id=-1, site=site, send_time=send_time, period=mode, url=url, user_id=current_user.id, status=status,
+               secret=secret, kw=kw, name=name)
     print(temp)
     mss = Mysql()
     mss.add_bot(temp)
@@ -204,6 +214,7 @@ def bot_info(id):
     # if mysql:
     #     x = list(filter(lambda x: x[0] == id, mysql.query_all_bot()))[0]
     x = list(filter(lambda y: y[0] == id, mysql.query_all_bot()))[0]
+    mysql.end()
     return render_template('info.html', x=x)
 
 
@@ -212,12 +223,35 @@ def bot_info(id):
 def bot_open(id):
     bot = global_bots[id]
     bot.status = 1
-    global_bots[id] = bot
-    bot.test()
-
+    # global_bots[id] = bot
+    # 修改数据库
+    ms = Mysql()
+    ms.cursor.execute('update bot set status=1 where id=%s', [bot.id])
+    ms.content.commit()
+    ms.end()
+    hr, mn, sc = bot.send_time.split(':')
+    scheduler1 = BackgroundScheduler()
+    scheduler1.add_job(bot.run, 'cron', hour=hr, minute=mn, second=sc)
+    global_running_scheduler[bot.id] = scheduler1
+    scheduler1.start()
+    print('非阻塞')
+    print(global_running_scheduler)
     return redirect(url_for('manage'))
 
 
+@app.route('/bot_close/<int:id>')
+@login_required
+def bot_close(id):
+    global_bots[id].status = 0
+    # 修改数据库
+    ms = Mysql()
+    ms.cursor.execute('update bot set status=0 where id=%s', global_bots[id].id)
+    ms.content.commit()
+    ms.end()
+    global_running_scheduler[id].shutdown()
+    print(global_running_scheduler, '关闭')
+    return redirect(url_for('manage'))
+
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5050,processes=True)
+    app.run(debug=True, host='0.0.0.0', port=5050, processes=True)

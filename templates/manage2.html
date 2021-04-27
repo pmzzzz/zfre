@@ -70,7 +70,7 @@
               {% if bot.status ==0 %}
              <a href="{{ url_for('bot_open', id=bot.id) }}" class="btn btn-success" role ="button">打开</a>
                   {% else %}
-                  <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-warning" role ="button">关闭</a>
+                  <a href="{{ url_for('bot_close', id=bot.id) }}" class="btn btn-warning" role ="button">关闭</a>
                     {% endif %}
 
 {#                    {% else %}#}

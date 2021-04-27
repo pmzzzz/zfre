@@ -7,7 +7,12 @@ secret = 'SEC324fa30727ff0505cc3beb25f92fa32e92f58423082f31f7b190c4f9131ed65f'
 
 bot = Bot(name='人社', url=url, secret=secret, bot_id=1, user_id=100, status=0,kw='大数据',period='week',send_time='15:33:00',site='人社、经信委、科委')
 bot.kw = '，'
-x = bot.test()
+# x = bot.test()
+xxx = bot
+xxx.kw = 'dsds'
+print(bot.kw)
+
+
 # os.getgid(x)
 
 # from threading import Thread
