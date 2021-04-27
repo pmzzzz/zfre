@@ -59,38 +59,185 @@
         <td> {{ bot.create_time }}</td>
         <td> {{ bot.status }}</td>
          <td>
+{#         <a class='fa fa-lg fa-warning text-red' data-toggle="modal" data-href='{{url_for('bot_info', id=bot.id)}}'#}
+{#                                    data-target="#confirm-delete">删除</a>#}
 {#                    {% if bot.status %}#}
-                    <a href="{{ url_for('delete_bot', id=bot.id) }}" class="btn btn-danger" role ="button">删除</a>
+{#                    <a href="{{ url_for('delete_bot', id=bot.id) }}" class="btn btn-danger" role ="button">删除</a>#}
+         <button id="btn_delete" type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteBot{{ bot.id }}">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true" ></span>删除
+            </button>
 {#                    {% else %}#}
 {#                    <a href="{{ url_for('modify_bot', id=bot.id) }}" class="btn btn-success" role ="button">修改</a>#}
 {#                    <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">详情</a>#}
-          <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">测试连接</a>
-             {% if bot.status == 0 %}
-             <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">打开</a>
+{#          <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">测试连接</a>#}
+{#             {% if bot.status == 0 %}#}
+{#             <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">打开</a>#}
 {#                    {% endif %}#}
+{##}
+{#    {% elif bot.status ==1 %}#}
+{#<a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">关闭</a>#}
+{#    {% else %}#}
+{#<a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">重启</a>#}
+{#    {% endif %}#}
+{#         <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">#}
+{#    添加#}
+{#</button>#}
 
-    {% elif bot.status ==1 %}
-<a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">关闭</a>
-    {% else %}
-<a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">重启</a>
-    {% endif %}
+   <!-- 模态框（Modal）删除机器人 -->
+<div class="modal fade" id="deleteBot{{ bot.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    删除机器人
+                </h4>
+            </div>
+           <p>确认删除{{ bot.name }}吗？</p>
+            <div class="modal-footer">
+                <a href="{{ url_for('delete_bot', id=bot.id) }}" class="btn btn-danger" role ="button">确认</a>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
      </td>
     {% endfor %}
-    {% endif %}
     </tr>
-
-
+    {% endif %}
     </table>
-    </div>
+</div>
 
     <div class="container">
        <div id="toolbar" class="btn-group">
-            <button id="btn_add" type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>添加机器人
+            <button id="btn_add" type="button" class="btn btn-default" data-toggle="modal" data-target="#addBot">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true" ></span>添加机器人
             </button>
     </div>
 
     </div>
+
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    模态框（Modal）标题
+                </h4>
+            </div>
+            <form id="form_data">
+            <div class="modal-body">
+                user_id: <input type="text" id="user_id" name="user_id"/>
+                name: <input type="text" id="user_name" name="user_name"/>
+                <input type="hidden" id="act" value="add" name="act"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+                <button type="button" onclick="add_info()" class="btn btn-primary" >
+                    提交更改
+                </button>
+            </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+    <!-- 模态框（Modal）添加机器人 -->
+<div class="modal fade" id="addBot" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    添加机器人
+                </h4>
+            </div>
+                <form method="POST" class="my-login-validation" novalidate="" action="/add_bot">
+                    <div class="form-group">
+                        <label for="url">url:</label>
+                        <input id="url" type="text" class="form-control" name="url" value="" required autofocus>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="secret">secret</label>
+                        <input id="secret" type="text" class="form-control" name="url" value="" required autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label for="secret">机器人名称</label>
+                        <input id="secret" type="text" class="form-control" name="url" value="" required autofocus>
+                    </div>
+
+                <div class="form-group">
+                    选择爬取网站：
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox1" value="人社" name="sites"> 人社
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox2" value="科委" name="sites"> 科委
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="inlineCheckbox3" value="信经委" name="sites"> 信经委
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="send_time">发送时间 （h:m:s）</label>
+                    <input id="send_time" type="text" class="form-control" name="send_time" value="" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    选择爬取模式
+                     <label class="radio-inline">
+                    <input type="radio" name="mode" id="optionsRadios3" value="option1" checked> day
+                    </label>
+                    <label class="radio-inline">
+                    <input type="radio" name="mode" id="optionsRadios4"  value="option2"> week
+                    </label>
+                </div>
+
+   <button type="submit"  class="btn btn-primary" >
+                    添加机器人
+                </button>
+
+                </form>
+{#            <form method="POST" action="#" >#}
+{#            <div class="form-group">#}
+{#                user_id: <input type="text" id="user_id" name="user_id"/>#}
+{#                name: <input type="text" id="user_name" name="user_name"/>#}
+{#                <input type="hidden" id="act" value="add" name="act"/>#}
+{#            </div>#}
+
+
+{#                <div class="form-group">#}
+{#    <label class="sr-only" for="name">名称</label>#}
+{#    <input type="text" class="form-control" id="name" placeholder="请输入名称">#}
+{#  </div>#}
+{##}
+{#            <div class="modal-footer">#}
+{#                <button type="button" class="btn btn-default" data-dismiss="modal">取消#}
+{#                </button>#}
+{#                <button type="submit"  class="btn btn-primary" >#}
+{#                    提交更改#}
+{#                </button>#}
+{#            </div>#}
+
+
+{#            </form>#}
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
 
 
 {% endblock %}

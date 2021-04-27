@@ -19,9 +19,9 @@ pri = Mysql()
 pri.cursor.execute('select id,url,secret,name,status,kw,period,send_time,user_id,create_time,site from bot')
 ppp = pri.cursor.fetchall()
 pri.end()
-global_bots = {i[0]:Bot(bot_id=i[0],url=i[1],secret=i[2],name=i[3],status=i[4],
-                        kw=i[5],period=i[6],send_time=i[7],user_id=i[8],create_time=i[9],site=i[10]
-                        ) for i in ppp
+global_bots = {i[0]: Bot(bot_id=i[0], url=i[1], secret=i[2], name=i[3], status=i[4],
+                         kw=i[5], period=i[6], send_time=i[7], user_id=i[8], create_time=i[9], site=i[10]
+                         ) for i in ppp
                }
 
 
@@ -99,7 +99,7 @@ def manage():
         #     bots = [Bot(bot_id=bot[0], url=bot[1], secret=bot[2], name=bot[3], status=bot[4], kw=bot[5], period=bot[6],
         #                 send_time=bot[7], user_id=bot[8], create_time=bot[9], site=bot[10]) for bot in bots]
         if len(bots) >= 1:
-            bots = [j for i,j in global_bots.items() if i in [x[0] for x in bots]]
+            bots = [j for i, j in global_bots.items() if i in [x[0] for x in bots]]
         else:
             pass
         # print(bots[0].status, 'dsdwedei问问去')
@@ -135,9 +135,6 @@ def register():
 @app.route('/modify/<int:id>', methods=['GET', 'POST'])
 @login_required
 def modify_bot(id):
-
-
-
     return str(id) + '正在修改'
 
 
@@ -147,6 +144,15 @@ def delete_bot(id):
     flash(str(id) + '被删了')
 
     return redirect(url_for('manage'))
+
+
+@app.route('/add_bot', methods=['POST'])
+@login_required
+def add_bot():
+    print('sdsds')
+    print(request.form.to_dict())
+    print(request.form.getlist('sites'))
+    return 'hxhxh'
 
 
 @app.route('/logout')

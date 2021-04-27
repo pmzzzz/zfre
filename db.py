@@ -44,11 +44,18 @@ class Mysql:
         self.cursor.execute('select * from user where id = %s limit 1 ', [id])
         return self.cursor.fetchall()
 
-    def add_bot(self, name, url, secret, user_id, create_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
-                status=0, kw='大数据', site='人社', period=1, send_time='09:00'):
+    # def add_bot(self, name, url, secret, user_id, create_time=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+    #             status=0, kw='大数据', site='人社', period=1, send_time='09:00'):
+    #     sql = 'insert into bot (name ,url,secret,user_id,create_time,status,kw,site,`period`,send_time) values (%s,' \
+    #           '%s,%s,%s,%s,%s,%s,%s,%s,%s) '
+    #     self.cursor.execute(sql, [name, url, secret, user_id, create_time, status, kw, site, period, send_time])
+    #     self.content.commit()
+    def add_bot(self, bot):
         sql = 'insert into bot (name ,url,secret,user_id,create_time,status,kw,site,`period`,send_time) values (%s,' \
               '%s,%s,%s,%s,%s,%s,%s,%s,%s) '
-        self.cursor.execute(sql, [name, url, secret, user_id, create_time, status, kw, site, period, send_time])
+        self.cursor.execute(sql,
+                            [bot.name, bot.url, bot.secret, bot.user_id, bot.create_time, bot.status, bot.kw, bot.site,
+                             bot.period, bot.send_time])
         self.content.commit()
 
     def query_bots_by_user_id(self, user_id):
