@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}详情{% endblock %}
+
+{% block navli %}
+
+
+{% endblock navli %}
+
+
+{% block content %}
+
+
+<div class="container text-center">
+<!--        <img src="/img/logo.png" alt="logo">-->
+    <p>{{ x }}</p>
+    <a href="{{ url_for('modify_bot', id=x[0]) }}" class="btn btn-success" role ="button">修改配置</a>
+</div>
+{% endblock %}

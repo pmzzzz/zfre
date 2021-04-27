@@ -14,6 +14,17 @@ bootstrap = Bootstrap(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
+# 装载所有机器人, id:机器人实例
+pri = Mysql()
+pri.cursor.execute('select id,url,secret,name,status,kw,period,send_time,user_id,create_time,site from bot')
+ppp = pri.cursor.fetchall()
+pri.end()
+global_bots = {i[0]:Bot(bot_id=i[0],url=i[1],secret=i[2],name=i[3],status=i[4],
+                        kw=i[5],period=i[6],send_time=i[7],user_id=i[8],create_time=i[9],site=i[10]
+                        ) for i in ppp
+               }
+
+
 # login_manager.login_message = u"请先登陆"
 
 # print(current_user, '89989')
@@ -84,10 +95,14 @@ def manage():
         print(current_user.password)
         mysql = Mysql()
         bots = mysql.query_bots_by_user_id(current_user.id)
+        # if len(bots) >= 1:
+        #     bots = [Bot(bot_id=bot[0], url=bot[1], secret=bot[2], name=bot[3], status=bot[4], kw=bot[5], period=bot[6],
+        #                 send_time=bot[7], user_id=bot[8], create_time=bot[9], site=bot[10]) for bot in bots]
         if len(bots) >= 1:
-            bots = [Bot(bot_id=bot[0], url=bot[1], secret=bot[2], name=bot[3], status=bot[4], kw=bot[5], period=bot[6],
-                        send_time=bot[7], user_id=bot[8], create_time=bot[9], site=bot[10]) for bot in bots]
-        print(bots[0].status, 'dsdwedei问问去')
+            bots = [j for i,j in global_bots.items() if i in [x[0] for x in bots]]
+        else:
+            pass
+        # print(bots[0].status, 'dsdwedei问问去')
         # bot = Bot(1, '123.com', 'se2448yb', '人社')
         # bots = [bot, bot, bot]
         #     name, url, secret, bot_id, user_id, status, kw = '大数据', site = '人设', period = 1, send_time = '09:00'
@@ -105,7 +120,7 @@ def register():
         mysql = Mysql()
         email = request.form.get('email', None)
         tem = mysql.query_mail(email)
-        print(tem,'ddddddddddd')
+        print(tem, 'ddddddddddd')
         if tem:
             flash('邮箱已注册')
             return redirect(url_for('register'))
@@ -120,6 +135,9 @@ def register():
 @app.route('/modify/<int:id>', methods=['GET', 'POST'])
 @login_required
 def modify_bot(id):
+
+
+
     return str(id) + '正在修改'
 
 
@@ -127,7 +145,7 @@ def modify_bot(id):
 @login_required
 def delete_bot(id):
     flash(str(id) + '被删了')
-    bots.pop()
+
     return redirect(url_for('manage'))
 
 
@@ -142,8 +160,13 @@ def logout():
 @app.route('/bot_info/<int:id>')
 @login_required
 def bot_info(id):
-    return str(id) + '的详情'
+    mysql = Mysql()
+    # if mysql:
+    #     x = list(filter(lambda x: x[0] == id, mysql.query_all_bot()))[0]
+    x = list(filter(lambda y: y[0] == id, mysql.query_all_bot()))[0]
+
+    return render_template('info.html', x=x)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5050)

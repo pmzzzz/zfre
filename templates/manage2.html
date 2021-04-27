@@ -54,7 +54,7 @@
 {% for i,bot in bots %}
     <tr>
         <td>{{ bot.id }}</td>
-        <td> {{ bot.name }}</td>
+        <td> <a href="{{ url_for('bot_info', id=bot.id) }}"> {{ bot.name }}</a></td>
         <td> {{ bot.kw }}</td>
         <td> {{ bot.create_time }}</td>
         <td> {{ bot.status }}</td>
@@ -62,8 +62,9 @@
 {#                    {% if bot.status %}#}
                     <a href="{{ url_for('delete_bot', id=bot.id) }}" class="btn btn-danger" role ="button">删除</a>
 {#                    {% else %}#}
-                    <a href="{{ url_for('modify_bot', id=bot.id) }}" class="btn btn-success" role ="button">修改</a>
-                    <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">详情</a>
+{#                    <a href="{{ url_for('modify_bot', id=bot.id) }}" class="btn btn-success" role ="button">修改</a>#}
+{#                    <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">详情</a>#}
+          <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">测试连接</a>
              {% if bot.status == 0 %}
              <a href="{{ url_for('bot_info', id=bot.id) }}" class="btn btn-success" role ="button">打开</a>
 {#                    {% endif %}#}
@@ -90,7 +91,6 @@
     </div>
 
     </div>
-
 
 
 {% endblock %}
